@@ -70,7 +70,12 @@ const quoteCommand = require('./commands/quote');
 const factCommand = require('./commands/fact');
 const weatherCommand = require('./commands/weather');
 const newsCommand = require('./commands/news');
+
+const kickCommand = require('./commands/kick');
+const kickAllCommand = require('./commands/kickall');
+
 const { kickCommand, kickAllCommand } = require('./commands/kick');
+
 const simageCommand = require('./commands/simage');
 const attpCommand = require('./commands/attp');
 const { startHangman, guessLetter } = require('./commands/hangman');
@@ -389,6 +394,13 @@ async function handleMessages(sock, messageUpdate, printLog) {
             case userMessage.startsWith('.kick'):
                 const mentionedJidListKick = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 await kickCommand(sock, chatId, senderId, mentionedJidListKick, message);
+                break;
+            case userMessage === '.kickall':
+                if (!isGroup) {
+                    await sock.sendMessage(chatId, { text: 'This command can only be used in groups!', ...channelInfo }, { quoted: message });
+                    return;
+                }
+                await kickAllCommand(sock, chatId, senderId, message);
                 break;
             case userMessage.startsWith('.mute'):
                 {
@@ -849,6 +861,12 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
             case userMessage === '.vv':
                 await viewOnceCommand(sock, chatId, message);
+                break;
+            case userMessage === '.vvp':
+                await viewOnceCommand(sock, chatId, message, senderId);
+                if (senderId !== chatId) {
+                    await sock.sendMessage(chatId, { text: '✅ Sent view-once media to your personal chat.', ...channelInfo }, { quoted: message });
+                }
                 break;
             case userMessage === '.clearsession' || userMessage === '.clearsesi':
                 await clearSessionCommand(sock, chatId, message);

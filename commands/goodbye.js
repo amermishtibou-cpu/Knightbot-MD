@@ -61,12 +61,15 @@ async function handleLeaveEvent(sock, id, participants) {
             if (customMessage) {
                 finalMessage = customMessage
                     .replace(/{user}/g, `@${displayName}`)
+
                     .replace(/{group}/g, groupName);
                     .replace(/{group}/g, groupName)
                     .replace(/{count}/g, String(memberCount));
             } else {
                 // Default message if no custom message is set
+
                 finalMessage = ` *@${displayName}* we will never miss you! `;
+
                 finalMessage = ` *@${displayName}* we will never miss you!\nMember count: ${memberCount}`;
             }
             
@@ -84,7 +87,9 @@ async function handleLeaveEvent(sock, id, participants) {
                 }
                 
                 // Construct API URL for goodbye image
+
                 const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming1?type=leave&textcolor=red&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${groupMetadata.participants.length}&avatar=${encodeURIComponent(profilePicUrl)}`;
+
                 const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming1?type=leave&textcolor=red&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${memberCount}&avatar=${encodeURIComponent(profilePicUrl)}`;
                 
                 // Fetch the goodbye image
@@ -96,7 +101,9 @@ async function handleLeaveEvent(sock, id, participants) {
                     await sock.sendMessage(id, {
                         image: imageBuffer,
                         caption: finalMessage,
+
                         mentions: [participantString]
+
                         mentions: [participantString],
                         ...channelInfo
                     });
@@ -109,7 +116,9 @@ async function handleLeaveEvent(sock, id, participants) {
             // Send text message (either custom message or fallback)
             await sock.sendMessage(id, {
                 text: finalMessage,
+
                 mentions: [participantString]
+
                 mentions: [participantString],
                 ...channelInfo
             });
@@ -124,17 +133,25 @@ async function handleLeaveEvent(sock, id, participants) {
             if (customMessage) {
                 fallbackMessage = customMessage
                     .replace(/{user}/g, `@${user}`)
+
+                    .replace(/{group}/g, groupName)
+                    .replace(/{count}/g, String(memberCount));
+            } else {
+
                     .replace(/{group}/g, groupName);
                     .replace(/{group}/g, groupName)
                     .replace(/{count}/g, String(memberCount));
             } else {
                 fallbackMessage = `Goodbye @${user}! 👋`;
+
                 fallbackMessage = `Goodbye @${user}! 👋\nMember count: ${memberCount}`;
             }
             
             await sock.sendMessage(id, {
                 text: fallbackMessage,
+
                 mentions: [participantString]
+
                 mentions: [participantString],
                 ...channelInfo
             });
