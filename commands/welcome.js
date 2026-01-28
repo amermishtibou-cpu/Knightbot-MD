@@ -1,6 +1,7 @@
 const { handleWelcome } = require('../lib/welcome');
 const { isWelcomeOn, getWelcome } = require('../lib/index');
 const { channelInfo } = require('../lib/messageConfig');
+const { formatIndianDateTime } = require('../lib/myfunc');
 const fetch = require('node-fetch');
 
 async function welcomeCommand(sock, chatId, message, match) {
@@ -71,10 +72,14 @@ async function handleJoinEvent(sock, id, participants) {
             } else {
                 // Default message if no custom message is set
                 const now = new Date();
+
                 const timeString = now.toLocaleString('en-IN', {
                     timeZone: 'Asia/Kolkata',
+
+                const timeString = formatIndianDateTime(now, {
+
                     month: '2-digit',
-                    day: '2-digit', 
+                    day: '2-digit',
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
