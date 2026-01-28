@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const isAdmin = require('../lib/isAdmin');
+const { formatIndianDateTime } = require('../lib/myfunc');
 
 // Define paths
 const databaseDir = path.join(process.cwd(), 'data');
@@ -98,7 +99,7 @@ async function warnCommand(sock, chatId, senderId, mentionedJids, message) {
                 `👤 *Warned User:* @${userToWarn.split('@')[0]}\n` +
                 `⚠️ *Warning Count:* ${warnings[chatId][userToWarn]}/3\n` +
                 `👑 *Warned By:* @${senderId.split('@')[0]}\n\n` +
-                `📅 *Date:* ${new Date().toLocaleString()}`;
+                `📅 *Date:* ${formatIndianDateTime()}`;
 
             await sock.sendMessage(chatId, { 
                 text: warningMessage,

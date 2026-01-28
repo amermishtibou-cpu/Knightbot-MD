@@ -1,4 +1,5 @@
 const { isAdmin } = require('../lib/isAdmin');
+const { formatIndianDateTime } = require('../lib/myfunc');
 
 // Function to handle manual promotions via command
 async function promoteCommand(sock, chatId, mentionedJids, message) {
@@ -37,7 +38,7 @@ async function promoteCommand(sock, chatId, mentionedJids, message) {
             `👥 *Promoted User${userToPromote.length > 1 ? 's' : ''}:*\n` +
             `${usernames.map(name => `• ${name}`).join('\n')}\n\n` +
             `👑 *Promoted By:* @${promoterJid.split('@')[0]}\n\n` +
-            `📅 *Date:* ${new Date().toLocaleString()}`;
+            `📅 *Date:* ${formatIndianDateTime()}`;
         await sock.sendMessage(chatId, { 
             text: promotionMessage,
             mentions: [...userToPromote, promoterJid]
@@ -82,7 +83,7 @@ async function handlePromotionEvent(sock, groupId, participants, author) {
             `👥 *Promoted User${participants.length > 1 ? 's' : ''}:*\n` +
             `${promotedUsernames.map(name => `• ${name}`).join('\n')}\n\n` +
             `👑 *Promoted By:* ${promotedBy}\n\n` +
-            `📅 *Date:* ${new Date().toLocaleString()}`;
+            `📅 *Date:* ${formatIndianDateTime()}`;
         
         await sock.sendMessage(groupId, {
             text: promotionMessage,
