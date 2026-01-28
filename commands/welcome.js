@@ -65,6 +65,9 @@ async function handleJoinEvent(sock, id, participants) {
                     .replace(/{group}/g, groupName)
                     .replace(/{description}/g, groupDesc)
                     .replace(/{count}/g, String(memberCount));
+                if (!customMessage.includes('{count}')) {
+                    finalMessage += `\nMember count: ${memberCount}`;
+                }
             } else {
                 // Default message if no custom message is set
                 const now = new Date();
