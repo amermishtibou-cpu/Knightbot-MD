@@ -1,5 +1,11 @@
 const isAdmin = require('../lib/isAdmin');
 
+function getUserNumber(jid) {
+    if (!jid) return '';
+    const withoutDevice = jid.includes(':') ? jid.split(':')[0] : jid;
+    return withoutDevice.split('@')[0];
+}
+
 async function kickCommand(sock, chatId, senderId, mentionedJids, message) {
     const isOwner = message.key.fromMe;
     if (!isOwner) {
@@ -127,4 +133,78 @@ async function kickCommand(sock, chatId, senderId, mentionedJids, message) {
     }
 }
 
-module.exports = kickCommand;
+async function kickAllCommand(sock, chatId, senderId, message) {
+    const isOwner = message.key.fromMe;
+    if (!isOwner) {
+        const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
+
+        if (!isBotAdmin) {
+            await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' }, { quoted: message });
+            return;
+        }
+
+        if (!isSenderAdmin) {
+            await sock.sendMessage(chatId, { text: 'Only group admins can use the kickall command.' }, { quoted: message });
+            return;
+        }
+    }
+
+    const metadata = await sock.groupMetadata(chatId);
+    const participants = metadata.participants || [];
+
+    const botId = sock.user?.id || '';
+    const botLid = sock.user?.lid || '';
+    const botNumbers = new Set([getUserNumber(botId), getUserNumber(botLid)]);
+    const senderNumber = getUserNumber(senderId);
+
+    const usersToKick = [];
+    const skipped = {
+        bot: 0,
+        sender: 0,
+        owner: 0
+    };
+
+    for (const participant of participants) {
+        const participantJid = participant.id || participant.lid;
+        const participantNumber = getUserNumber(participantJid);
+
+        if (botNumbers.has(participantNumber)) {
+            skipped.bot += 1;
+            continue;
+        }
+
+        if (participantNumber === senderNumber) {
+            skipped.sender += 1;
+            continue;
+        }
+
+        if (participant.admin === 'superadmin') {
+            skipped.owner += 1;
+            continue;
+        }
+
+        if (participantJid) {
+            usersToKick.push(participantJid);
+        }
+    }
+
+    if (usersToKick.length === 0) {
+        await sock.sendMessage(chatId, { text: 'There is no one to kick right now.' }, { quoted: message });
+        return;
+    }
+
+    try {
+        await sock.groupParticipantsUpdate(chatId, usersToKick, 'remove');
+        const summaryParts = [`✅ Kicked ${usersToKick.length} member(s).`];
+        if (skipped.sender) summaryParts.push('Skipped you.');
+        if (skipped.bot) summaryParts.push('Skipped the bot.');
+        if (skipped.owner) summaryParts.push('Skipped the group owner.');
+
+        await sock.sendMessage(chatId, { text: summaryParts.join(' ') }, { quoted: message });
+    } catch (error) {
+        console.error('Error in kickall command:', error);
+        await sock.sendMessage(chatId, { text: 'Failed to kick all members!' }, { quoted: message });
+    }
+}
+
+module.exports = { kickCommand, kickAllCommand };
