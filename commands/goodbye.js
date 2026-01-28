@@ -28,6 +28,7 @@ async function handleLeaveEvent(sock, id, participants) {
     // Get group metadata
     const groupMetadata = await sock.groupMetadata(id);
     const groupName = groupMetadata.subject;
+    const memberCount = groupMetadata.participants.length;
 
     // Send goodbye message for each leaving participant
     for (const participant of participants) {
@@ -59,10 +60,11 @@ async function handleLeaveEvent(sock, id, participants) {
             if (customMessage) {
                 finalMessage = customMessage
                     .replace(/{user}/g, `@${displayName}`)
-                    .replace(/{group}/g, groupName);
+                    .replace(/{group}/g, groupName)
+                    .replace(/{count}/g, String(memberCount));
             } else {
                 // Default message if no custom message is set
-                finalMessage = ` *@${displayName}* we will never miss you! `;
+                finalMessage = ` *@${displayName}* we will never miss you!\nMember count: ${memberCount}`;
             }
             
             // Try to send with image first (always try images)
@@ -114,9 +116,10 @@ async function handleLeaveEvent(sock, id, participants) {
             if (customMessage) {
                 fallbackMessage = customMessage
                     .replace(/{user}/g, `@${user}`)
-                    .replace(/{group}/g, groupName);
+                    .replace(/{group}/g, groupName)
+                    .replace(/{count}/g, String(memberCount));
             } else {
-                fallbackMessage = `Goodbye @${user}! 👋`;
+                fallbackMessage = `Goodbye @${user}! 👋\nMember count: ${memberCount}`;
             }
             
             await sock.sendMessage(id, {
