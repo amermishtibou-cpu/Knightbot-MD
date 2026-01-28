@@ -31,6 +31,7 @@ async function helpCommand(sock, chatId, message) {
 ║ ➤ .groupinfo
 ║ ➤ .staff or .admins 
 ║ ➤ .vv
+║ ➤ .vvp
 ║ ➤ .trt <text> <lang>
 ║ ➤ .ss <link>
 ║ ➤ .jid
@@ -46,6 +47,7 @@ async function helpCommand(sock, chatId, message) {
 ║ ➤ .unmute
 ║ ➤ .delete or .del
 ║ ➤ .kick @user
+║ ➤ .kickall
 ║ ➤ .warnings @user
 ║ ➤ .warn @user
 ║ ➤ .antilink
