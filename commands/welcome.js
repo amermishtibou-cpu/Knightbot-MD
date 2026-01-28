@@ -30,6 +30,7 @@ async function handleJoinEvent(sock, id, participants) {
     const groupMetadata = await sock.groupMetadata(id);
     const groupName = groupMetadata.subject;
     const groupDesc = groupMetadata.desc || 'No description available';
+    const memberCount = groupMetadata.participants.length;
 
     // Send welcome message for each new participant
     for (const participant of participants) {
@@ -62,11 +63,13 @@ async function handleJoinEvent(sock, id, participants) {
                 finalMessage = customMessage
                     .replace(/{user}/g, `@${displayName}`)
                     .replace(/{group}/g, groupName)
-                    .replace(/{description}/g, groupDesc);
+                    .replace(/{description}/g, groupDesc)
+                    .replace(/{count}/g, String(memberCount));
             } else {
                 // Default message if no custom message is set
                 const now = new Date();
-                const timeString = now.toLocaleString('en-US', {
+                const timeString = now.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
                     month: '2-digit',
                     day: '2-digit', 
                     year: 'numeric',
@@ -76,7 +79,7 @@ async function handleJoinEvent(sock, id, participants) {
                     hour12: true
                 });
                 
-                finalMessage = `╭╼━≪•𝙽𝙴𝚆 𝙼𝙴𝙼𝙱𝙴𝚁•≫━╾╮\n┃𝚆𝙴𝙻𝙲𝙾𝙼𝙴: @${displayName} 👋\n┃Member count: #${groupMetadata.participants.length}\n┃𝚃𝙸𝙼𝙴: ${timeString}⏰\n╰━━━━━━━━━━━━━━━╯\n\n*@${displayName}* Welcome to *${groupName}*! 🎉\n*Group 𝙳𝙴𝚂𝙲𝚁𝙸𝙿𝚃𝙸𝙾𝙽*\n${groupDesc}\n\n> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Knight Bot*`;
+                finalMessage = `╭╼━≪•𝙽𝙴𝚆 𝙼𝙴𝙼𝙱𝙴𝚁•≫━╾╮\n┃𝚆𝙴𝙻𝙲𝙾𝙼𝙴: @${displayName} 👋\n┃Member count: #${memberCount}\n┃𝚃𝙸𝙼𝙴: ${timeString}⏰\n╰━━━━━━━━━━━━━━━╯\n\n*@${displayName}* Welcome to *${groupName}*! 🎉\n*Group 𝙳𝙴𝚂𝙲𝚁𝙸𝙿𝚃𝙸𝙾𝙽*\n${groupDesc}\n\n> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Knight Bot*`;
             }
             
             // Try to send with image first (always try images)
@@ -93,7 +96,7 @@ async function handleJoinEvent(sock, id, participants) {
                 }
                 
                 // Construct API URL for welcome image
-                const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming3?type=join&textcolor=green&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${groupMetadata.participants.length}&avatar=${encodeURIComponent(profilePicUrl)}`;
+                const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming3?type=join&textcolor=green&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${memberCount}&avatar=${encodeURIComponent(profilePicUrl)}`;
                 
                 // Fetch the welcome image
                 const response = await fetch(apiUrl);
@@ -131,7 +134,8 @@ async function handleJoinEvent(sock, id, participants) {
                 fallbackMessage = customMessage
                     .replace(/{user}/g, `@${user}`)
                     .replace(/{group}/g, groupName)
-                    .replace(/{description}/g, groupDesc);
+                    .replace(/{description}/g, groupDesc)
+                    .replace(/{count}/g, String(memberCount));
             } else {
                 fallbackMessage = `Welcome @${user} to ${groupName}! 🎉`;
             }

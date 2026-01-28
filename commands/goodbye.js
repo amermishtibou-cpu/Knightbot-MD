@@ -1,5 +1,6 @@
 const { handleGoodbye } = require('../lib/welcome');
 const { isGoodByeOn, getGoodbye } = require('../lib/index');
+const { channelInfo } = require('../lib/messageConfig');
 const fetch = require('node-fetch');
 
 async function goodbyeCommand(sock, chatId, message, match) {
@@ -81,7 +82,7 @@ async function handleLeaveEvent(sock, id, participants) {
                 }
                 
                 // Construct API URL for goodbye image
-                const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming1?type=leave&textcolor=red&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${groupMetadata.participants.length}&avatar=${encodeURIComponent(profilePicUrl)}`;
+                const apiUrl = `https://api.some-random-api.com/welcome/img/2/gaming1?type=leave&textcolor=red&username=${encodeURIComponent(displayName)}&guildName=${encodeURIComponent(groupName)}&memberCount=${memberCount}&avatar=${encodeURIComponent(profilePicUrl)}`;
                 
                 // Fetch the goodbye image
                 const response = await fetch(apiUrl);
@@ -92,7 +93,8 @@ async function handleLeaveEvent(sock, id, participants) {
                     await sock.sendMessage(id, {
                         image: imageBuffer,
                         caption: finalMessage,
-                        mentions: [participantString]
+                        mentions: [participantString],
+                        ...channelInfo
                     });
                     continue; // Skip to next participant
                 }
@@ -103,7 +105,8 @@ async function handleLeaveEvent(sock, id, participants) {
             // Send text message (either custom message or fallback)
             await sock.sendMessage(id, {
                 text: finalMessage,
-                mentions: [participantString]
+                mentions: [participantString],
+                ...channelInfo
             });
         } catch (error) {
             console.error('Error sending goodbye message:', error);
@@ -124,7 +127,8 @@ async function handleLeaveEvent(sock, id, participants) {
             
             await sock.sendMessage(id, {
                 text: fallbackMessage,
-                mentions: [participantString]
+                mentions: [participantString],
+                ...channelInfo
             });
         }
     }
