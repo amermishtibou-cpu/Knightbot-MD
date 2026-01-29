@@ -71,6 +71,9 @@ const factCommand = require('./commands/fact');
 const weatherCommand = require('./commands/weather');
 const newsCommand = require('./commands/news');
 
+const kickCommand = require('./commands/kick');
+const kickAllCommand = require('./commands/kickall');
+
 const { kickCommand, kickAllCommand } = require('./commands/kick');
 
 const simageCommand = require('./commands/simage');
